@@ -102,8 +102,8 @@ def plot_MC_boundaries_keras(X_train, y_train, score, probability_func, degree=N
 
     ax.set_xlim(xx.min(), xx.max())
     ax.set_ylim(yy.min(), yy.max())
-    ax.set_xticks(())
-    ax.set_yticks(())
+    #ax.set_xticks(())
+    #ax.set_yticks(())
     ax.text(xx.max() - .3, yy.min() + .3, ('%.2f' % score).lstrip('0'),
             size=40, horizontalalignment='right')
     #return Zaux
