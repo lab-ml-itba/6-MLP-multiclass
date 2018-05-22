@@ -2,6 +2,7 @@ from keras.utils import to_categorical
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import ListedColormap
+import matplotlib as mpl
 
 def get_custom_cmap(Ri=0, Gi=0, Bi=0, alpha=0.8):
     N_c = 256
@@ -14,7 +15,7 @@ def get_custom_cmap(Ri=0, Gi=0, Bi=0, alpha=0.8):
     custom_map = ListedColormap(np.vstack([R,G,B,A]).T)
     return custom_map
 
-def plot_MC_boundaries_keras(X_train, y_train, score, probability_func, degree=None, bias=False, mesh_res = 300, h = .02, ax = None, margin=0.5, color_index = 0, normalize = False):
+def plot_MC_boundaries_keras(X_train, y_train, score, probability_func, degree=None, bias=False, mesh_res = 300, ax = None, margin=0.5, color_index = 0, normalize = False):
     y_train_cat_aux = to_categorical(y_train)
     if (y_train_cat_aux.shape[1] > 2):
         y_train_cat = y_train_cat_aux
@@ -58,8 +59,8 @@ def plot_MC_boundaries_keras(X_train, y_train, score, probability_func, degree=N
         Zaux = (Zaux.T/Zaux.sum(axis=1)).T
     
     cm_borders = ListedColormap(["#FFFFFFFF", "#000000"])
-    my_colors = [[0,0,0.5], [0,0.5,0], [0.5,0,0], [0,0,0], [0,0.5,0.5]]
-    
+    my_colors = [[0,0,0.5], [0,0.5,0], [0.5,0,0], [0.5,0.5,0.5], [0,0.5,0.5]]
+    # my_colors = [list(x) for x in list(mpl.colors.BASE_COLORS.values())]
     cat_order = len(y_train_cat.shape)
     if cat_order>1:
         Z_reshaped = Zaux.reshape(xx.shape[0], xx.shape[1], y_train_cat.shape[1])
@@ -95,10 +96,18 @@ def plot_MC_boundaries_keras(X_train, y_train, score, probability_func, degree=N
                edgecolors='k', 
                s=100)
     
-        
-    boundary_line = np.where(np.abs(Z_reshaped-0.5)<0.001)
+    boundary_line_1 = np.where(((Z_reshaped[1:,:]>=0.5)*(Z_reshaped[:-1,:]<=0.5)))
+    boundary_line_2 = np.where(((Z_reshaped[1:,:]<=0.5)*(Z_reshaped[:-1,:]>=0.5)))
+    boundary_line_3 = np.where(((Z_reshaped[:,1:]<=0.5)*(Z_reshaped[:,:-1]>=0.5)))
+    boundary_line_4 = np.where(((Z_reshaped[:,1:]>=0.5)*(Z_reshaped[:,:-1]<=0.5)))
+    ax.scatter(x_domain[boundary_line_1[1]], y_domain[boundary_line_1[0]], color='k', alpha=0.5, s=1)
+    ax.scatter(x_domain[boundary_line_2[1]], y_domain[boundary_line_2[0]], color='k', alpha=0.5, s=1)
+    ax.scatter(x_domain[boundary_line_3[1]], y_domain[boundary_line_3[0]], color='k', alpha=0.5, s=1)
+    ax.scatter(x_domain[boundary_line_4[1]], y_domain[boundary_line_4[0]], color='k', alpha=0.5, s=1)
+
+    #boundary_line = np.where(np.abs(Z_reshaped-0.5)<0.001)
     
-    ax.scatter(x_domain[boundary_line[1]], y_domain[boundary_line[0]], color='k', alpha=0.5, s=1)
+    #ax.scatter(x_domain[boundary_line[1]], y_domain[boundary_line[0]], color='k', alpha=0.5, s=1)
 
     ax.set_xlim(xx.min(), xx.max())
     ax.set_ylim(yy.min(), yy.max())
