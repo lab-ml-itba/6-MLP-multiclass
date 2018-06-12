@@ -1,13 +1,19 @@
 import keras
 import matplotlib.pyplot as plt
 from IPython.display import clear_output
+import numpy as np
 
 class PlotLosses(keras.callbacks.Callback):
-    def __init__(self, plot_interval=1, evaluate_interval=10, x_val=None, y_val_categorical=None):
+    def __init__(self, plot_interval=1, 
+                 evaluate_interval=10, 
+                 val_samples = 512, 
+                 x_val=None, 
+                 y_val_categorical=None):
         self.plot_interval = plot_interval
         self.evaluate_interval = evaluate_interval
         self.x_val = x_val
         self.y_val_categorical = y_val_categorical
+        self.val_samples = val_samples
         #self.model = model
     
     def on_train_begin(self, logs={}):
@@ -53,9 +59,10 @@ class PlotLosses(keras.callbacks.Callback):
                 self.x.append(self.i)
                 self.losses.append(logs.get('loss'))
                 self.acc.append(logs.get('acc'))
-
                 if self.x_val is not None:
-                    score = self.model.evaluate(self.x_val, self.y_val_categorical, verbose=0)
+                    indexes = np.random.permutation(range(self.x_val.shape[0]))
+                    score = self.model.evaluate(self.x_val[indexes][:self.val_samples], 
+                                                self.y_val_categorical[indexes][:self.val_samples], verbose=0)
                     self.val_losses.append(score[0])
                     self.val_acc.append(score[1])
             
